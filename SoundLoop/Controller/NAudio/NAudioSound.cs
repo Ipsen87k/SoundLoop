@@ -11,14 +11,14 @@ namespace SoundLoop.Controller.NAudio
 {
     internal class NAudioSound : NAudioBase
     {
-        public override async Task Read(string fname)
+        public override void Read(string fname)
         {
-            await base.Read(fname);
+            base.Read(fname);
             if (NullState || Stooped)
             {
                 SoundData.WaveStream = new AudioFileReader(fname);
                 SoundData.WaveOutEvent.Init(SoundData.WaveStream);
-                await Play();
+                //await Play();
             }
         }
         public override async Task Play()

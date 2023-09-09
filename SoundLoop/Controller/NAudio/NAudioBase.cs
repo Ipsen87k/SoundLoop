@@ -56,7 +56,7 @@ namespace SoundLoop.Controller.NAudio
                 waveStream.Position = 0;
             }
         }
-        public virtual async Task Read(string fname)
+        public virtual void Read(string fname)
         {
             if (Paused)
                 SoundData.WaveOutEvent.Play();

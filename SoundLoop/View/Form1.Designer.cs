@@ -40,9 +40,11 @@
 			volumeTrackBar = new TrackBar();
 			statusStrip1 = new StatusStrip();
 			fnameStripStatusLabel = new ToolStripStatusLabel();
+			TimeBar = new TrackBar();
 			menuStrip1.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)volumeTrackBar).BeginInit();
 			statusStrip1.SuspendLayout();
+			((System.ComponentModel.ISupportInitialize)TimeBar).BeginInit();
 			SuspendLayout();
 			// 
 			// menuStrip1
@@ -126,11 +128,19 @@
 			fnameStripStatusLabel.Size = new Size(38, 17);
 			fnameStripStatusLabel.Text = "status";
 			// 
+			// TimeBar
+			// 
+			TimeBar.Location = new Point(0, 380);
+			TimeBar.Name = "TimeBar";
+			TimeBar.Size = new Size(800, 45);
+			TimeBar.TabIndex = 4;
+			// 
 			// Form1
 			// 
 			AutoScaleDimensions = new SizeF(7F, 15F);
 			AutoScaleMode = AutoScaleMode.Font;
 			ClientSize = new Size(800, 450);
+			Controls.Add(TimeBar);
 			Controls.Add(statusStrip1);
 			Controls.Add(volumeTrackBar);
 			Controls.Add(menuStrip1);
@@ -142,6 +152,7 @@
 			((System.ComponentModel.ISupportInitialize)volumeTrackBar).EndInit();
 			statusStrip1.ResumeLayout(false);
 			statusStrip1.PerformLayout();
+			((System.ComponentModel.ISupportInitialize)TimeBar).EndInit();
 			ResumeLayout(false);
 			PerformLayout();
 		}
@@ -160,5 +171,6 @@
 		private ToolStripMenuItem mp4Tomp3ToolStripMenuItem;
 		private ToolStripMenuItem mp3ToWavToolStripMenuItem;
 		private ToolStripMenuItem pauseToolStripMenuItem1;
+		private TrackBar TimeBar;
 	}
 }
