@@ -97,18 +97,30 @@ namespace SoundLoop.Controller
             var currentTimeValue = TimeBar.Value;
 #if DEBUG
 			Debug.WriteLine($"timebar = {currentTimeValue}");
-			Debug.WriteLine($"現在の動画時間 = {SoundData.WaveStream.Position}");
+			Debug.WriteLineIf(true,$"現在の動画時間 = {SoundData.WaveStream.Position}");
 #endif
 			_NAudio.Pause();
             timer.Enabled = false;
-			SoundData.WaveStream.Position = currentTimeValue;
+            //SoundData.WaveStream.CurrentTime = TimeSpan.FromSeconds( currentTimeValue );
+            SoundData.WaveStream.Position = currentTimeValue * SoundData.WaveStream.WaveFormat.AverageBytesPerSecond;
             _NAudio.Play();
             timer.Enabled = true;
         }
 
         public void TimerTickChangeTimeBarValue(object sender, EventArgs e)
         {
-            TimeBar.Value=SoundData.WaveStream.CurrentTime.Seconds;
+            var currentTime = (int)(SoundData.WaveStream.Position / SoundData.WaveStream.WaveFormat.AverageBytesPerSecond);
+            if( currentTime > TimeBar.Maximum)
+            {
+                currentTime = TimeBar.Maximum;
+            }
+
+			TimeBar.Value= currentTime;
+#if DEBUG
+            Debug.WriteLineIf(false, $"現在の位置(current.second) = {SoundData.WaveStream.CurrentTime.Seconds}  TrackBarの最大値 = {TimeBar.Maximum}");
+            Debug.WriteLineIf(true,$"現在の位置 = {SoundData.WaveStream.Position/SoundData.WaveStream.WaveFormat.AverageBytesPerSecond}");
+#endif
         }
-    }
+
+	}
 }
