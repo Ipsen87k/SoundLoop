@@ -118,7 +118,7 @@ namespace SoundLoop.Controller
 			TimeBar.Value= currentTime;
 #if DEBUG
             Debug.WriteLineIf(false, $"現在の位置(current.second) = {SoundData.WaveStream.CurrentTime.Seconds}  TrackBarの最大値 = {TimeBar.Maximum}");
-            Debug.WriteLineIf(true,$"現在の位置 = {SoundData.WaveStream.Position/SoundData.WaveStream.WaveFormat.AverageBytesPerSecond}");
+            Debug.WriteLineIf(false,$"現在の位置 = {SoundData.WaveStream.Position/SoundData.WaveStream.WaveFormat.AverageBytesPerSecond}");
 #endif
         }
 
