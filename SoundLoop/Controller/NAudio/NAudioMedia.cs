@@ -11,22 +11,24 @@ namespace SoundLoop.Controller.NAudio
 {
     internal class NAudioMedia : NAudioBase
     {
-        public override void Read(string fname)
+        public override WaveStream Read(string fname)
         {
             base.Read(fname);
             if (NullState || Stooped)
             {
-                using (SoundData.WaveStream = new MediaFoundationReader(fname))
-                {
-                    SoundData.WaveOutEvent.Init(SoundData.WaveStream);
-                    //await Play();
-                }
+                //using (SoundData.WaveStream = new MediaFoundationReader(fname))
+                //{
+                //    SoundData.WaveOutEvent.Init(SoundData.WaveStream);
+                //    //await Play();
+                //}
             }
+            return null;
         }
-        public override async Task Play()
+        public override void Play()
         {
             Reset(SoundData.WaveStream);
-            await base.Play();
+            //await base.Play();
         }
+
     }
 }

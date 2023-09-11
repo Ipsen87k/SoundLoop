@@ -11,31 +11,40 @@ using SoundLoop.Models;
 
 namespace SoundLoop.Controller.NAudio
 {
-    abstract internal class NAudioBase : IUserPlaybackable,ISoundModelProvider
+    abstract internal class NAudioBase : IUserPlaybackable,ISoundModelProvider,IReadable<WaveStream>
     {
         public SoundData SoundData => SoundData.Instance;
+        protected WaveStream _stream;
+        protected WaveOutEvent _event;
+        public string _fileName { get; protected set; }
 
         protected bool Stooped => SoundData.WaveOutEvent.PlaybackState == PlaybackState.Stopped;
         protected bool Paused => SoundData.WaveOutEvent.PlaybackState == PlaybackState.Paused;
-        protected bool NullState => SoundData.WaveOutEvent?.PlaybackState == null;
+        public bool NullState => _event?.PlaybackState == null;
+        public bool IsStreamNull => _stream == null;
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public int GetCurrentSeconds => (int)(_stream.Position / _stream.WaveFormat.AverageBytesPerSecond);
+        public int GetTotalTimes => (int)(_stream.Length /  _stream.WaveFormat.AverageBytesPerSecond);
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Pause()
         {
-            SoundData.WaveOutEvent.Pause();
+            _event.Pause();
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void AdjustVolume(float volume)
         {
             SoundData.WaveOutEvent.Volume = volume;
         }
-        //LoopとPlayは再帰
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public virtual async Task Play()
+        public void WhenSeekChangeTime(int seconds)
         {
-            SoundData.WaveOutEvent.Play();
+            _stream.Position = seconds*_stream.WaveFormat.AverageBytesPerSecond;
+        }
 
-            await Task.Run(Loop);
+        //LoopとPlayは再帰
+        //[MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public virtual void Play()
+        {
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         protected async Task Loop()
@@ -47,7 +56,7 @@ namespace SoundLoop.Controller.NAudio
                 if (Paused)
                     return;
             }
-            await Play();
+  
         }
         protected void Reset(WaveStream waveStream)
         {
@@ -56,27 +65,28 @@ namespace SoundLoop.Controller.NAudio
                 waveStream.Position = 0;
             }
         }
-        public virtual void Read(string fname)
+        public virtual WaveStream Read(string fname)
         {
             if (Paused)
                 SoundData.WaveOutEvent.Play();
+            return null;
         }
 
         public async Task Resume()
         {
             if (Paused)
             {
-                await Play();
+                
             }
         }
 
-		public void Stop(WaveStream waveStream)
+		public void Stop()
 		{
-			if(waveStream == null)
+			if(_stream == null)
                 return;
             Pause();
             SoundData.WaveOutEvent.Stop();
-			waveStream.Dispose();
 		}
+
 	}
 }

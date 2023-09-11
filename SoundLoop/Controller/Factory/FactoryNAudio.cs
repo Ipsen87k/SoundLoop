@@ -10,14 +10,14 @@ using System.Xml.Linq;
 
 namespace SoundLoop.Controller.Factory
 {
-    internal class FactoryNAudio : IFactory<IUserPlaybackable>
+    internal class FactoryNAudio : IFactory<NAudioBase>
     {
-        public static IUserPlaybackable Create(string fname)
+        public static NAudioBase Create(string fname)
         {
             return fname?.GetExtensionWithoutPeriod() switch
             {
                 FormatsData.MP4 => new NAudioMedia(),
-                _ => new NAudioSound()
+                _ => new NAudioSound(fname)
             };
         }
     }

@@ -7,8 +7,8 @@ using System.Threading.Tasks;
 
 namespace SoundLoop.Controller.NAudio
 {
-    internal interface IReadable
+    internal interface IReadable<T> where T : class
     {
-        void Read(string fname);
+        T Read(string fname);
     }
 }

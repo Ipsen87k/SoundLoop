@@ -9,6 +9,6 @@ namespace SoundLoop.Controller.NAudio
 {
 	internal interface IStopable
 	{
-		void Stop(WaveStream waveStream);
+		void Stop();
 	}
 }
