@@ -15,16 +15,30 @@ namespace SoundLoop.Controller
     {
         public static string FileOpen(string fileter= "音声ファイル(*.wav,*.mp3,*.mp4|*.wav;*.mp3;*.mp4|" + "すべてのファイル(*.*)|*.*")
         {
-            string fname = null;
-            using(var openDialog=new OpenFileDialog())
+            try
             {
-                openDialog.Filter = fileter;
-                openDialog.FilterIndex = 1;
-                openDialog.CheckFileExists= true;
-                if(openDialog.ShowDialog() == DialogResult.OK)
-                    fname = openDialog.FileName;
+				string fname = null;
+				using (var openDialog = new OpenFileDialog())
+				{
+					openDialog.Filter = fileter;
+					openDialog.FilterIndex = 1;
+					openDialog.CheckFileExists = true;
+					if (openDialog.ShowDialog() == DialogResult.OK)
+						fname = openDialog.FileName;
+                    CheckExt(fname);
+				}
+				return fname;
+			}
+            catch(Exception ex)
+            {
+                var message = MessageBox.Show(ex.Message,"確認",MessageBoxButtons.OKCancel,MessageBoxIcon.Error);
+                if(message == DialogResult.OK)
+                {
+                    return FileOpen();
+                }
+                return null;
             }
-            return fname;
+
         }
         [Pure]
         public static string InvokeFileOpen(string fname)
@@ -47,6 +61,19 @@ namespace SoundLoop.Controller
                 iconPath = iconPath.Substring(0, t);
             }
             return Path.Combine(iconPath, "Icon", "audio.ico");
+        }
+        private static bool CheckExt(string fileName)
+        {
+            var ext = fileName.GetExtensionWithoutPeriod();
+            if (ext == FormatsData.WAV || ext == FormatsData.MP4 || ext == FormatsData.MP3)
+            {
+                return true;
+            }
+            else
+            {
+                throw new Exception("拡張子が違います");
+            }
+
         }
     }
 }

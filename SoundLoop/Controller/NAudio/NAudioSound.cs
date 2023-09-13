@@ -11,40 +11,37 @@ namespace SoundLoop.Controller.NAudio
 {
     internal class NAudioSound : NAudioBase
     {
-        public override WaveStream Read(string fname=null)
+        public override void Read(string fname=null)
         {
             base.Read(fname);
-            //if (NullState || Stooped)
-            //{
-                //SoundData.WaveStream = new AudioFileReader(fname);
-                //SoundData.WaveOutEvent.Init(SoundData.WaveStream);
-                //await Play();
-            if(fname != null)
-            {
-                _fileName = fname;
-            }
-            _stream = new AudioFileReader(this._fileName);
+
+            _stream = new AudioFileReader(this.FileName);
             _event = new WaveOutEvent();
             _event.PlaybackStopped += OnPlaybackStopped;
-			//}
-			return _stream;
+            Reset();
         }
         public override void Play()
         {
+            if (IsStreamNull)
+            {
+                return;
+            }
+			if (Paused)
+			{
+				_event.Play();
+			}
+            else
+            {
+				_event.Init(_stream);
+				_event.Play();
+			}
 
-            _event.Init(_stream);
-            _event.Play();
-        }
-		private void OnPlaybackStopped(object sender, StoppedEventArgs args)
-		{
-			_stream.Dispose();
-			_stream = null;
-			_event.Dispose();
-			_event = null;
+			
 		}
-        public NAudioSound(string fname)
+
+        public NAudioSound(string fname) : base(fname)
         {
-            this._fileName = fname;
+
         }
 	}
 }

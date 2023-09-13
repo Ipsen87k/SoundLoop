@@ -14,6 +14,8 @@ namespace SoundLoop.Controller
     internal class Form1Events:ISoundModelProvider
     {
         NAudioBase _NAudio;
+        private bool IsNAudioNull=> _NAudio == null;
+        private event EventHandler<EventArgs> OnStopped;
         public SoundData SoundData => SoundData.Instance;
         public System.Windows.Forms.Timer Timer { get; init; }
         public ToolStripStatusLabel Status {  get; init; }
@@ -28,15 +30,17 @@ namespace SoundLoop.Controller
             this.Timer = timer; 
             Form = form;
 
+            OnStopped += Form1Stop_Click;
         }
         public void FormOpen_Click(object sender, EventArgs e)
         {
             var fileName =UFileDialog.FileOpen();
             if (string.IsNullOrEmpty(fileName))
                 return;
-            if(_NAudio != null)
+            if(!IsNAudioNull)
             {
-                _NAudio.Stop();
+                //再生中にファイルを開いた時の対象
+                OnStopped?.Invoke(this,EventArgs.Empty);
             }
             _NAudio=FactoryNAudio.Create(fileName);
             
@@ -44,29 +48,44 @@ namespace SoundLoop.Controller
 
             _NAudio.Read(fileName);
 			Init();
+            VolumeBarInit();
 			_NAudio.Play();
-            
-
 
         }
-        public async void Form1Play_Click(object sender, EventArgs e)
+        public void Form1Play_Click(object sender, EventArgs e)
         {
-
+            if (IsNAudioNull)
+            {
+                return;
+            }
+			_NAudio.Play();
 		}
         public void Form1Pause_Click(object sender, EventArgs e)
         {
-            _NAudio.Pause();
+			if (IsNAudioNull)
+			{
+				return;
+			}
+			_NAudio.Pause();
         }
         public void Form1Volume_Change(object sender, EventArgs e)
         {
-            if (SoundData.WaveOutEvent is null)
-                return;
-            var adjustVolumeNum = 100f;
+			if (IsNAudioNull)
+			{
+				return;
+			}
+			var adjustVolumeNum = 100f;
 			_NAudio.AdjustVolume(VolumeBar.Value / adjustVolumeNum);
 		}
         public void Form1Stop_Click(object sender, EventArgs e)
         {
-            _NAudio.Stop();
+			if (IsNAudioNull)
+			{
+				return;
+			}
+			Timer.Enabled = false;
+			_NAudio.Stop();
+            _NAudio = null;
         }
         public void MP4ToMP3Convert_Click(object sender, EventArgs e)
         {
@@ -93,29 +112,37 @@ namespace SoundLoop.Controller
 #endif
 
         }
+        private void VolumeBarInit()
+        {
+            VolumeBar.Minimum = 0;
+            VolumeBar.Value = (int)_NAudio.GetVolume;
+#if DEBUG
+            Debug.WriteLineIf(true,$"音のサイズ = {_NAudio.GetVolume} VolumeBarの値 = {VolumeBar.Value}");
+#endif
+        }
         public void TimeBarSlideChanged(object sender, EventArgs e)
         {
-            var currentTimeValue = TimeBar.Value;
+			if (IsNAudioNull)
+			{
+				return;
+			}
+			var currentTimeValue = TimeBar.Value;
 #if DEBUG
-			Debug.WriteLine($"timebar = {currentTimeValue}");
+			Debug.WriteLineIf(false,$"timebar = {currentTimeValue}");
 			Debug.WriteLineIf(false,$"現在の動画時間 = {SoundData.WaveStream.Position}");
 #endif
-			_NAudio.Pause();
             Timer.Enabled = false;
-            //SoundData.WaveStream.CurrentTime = TimeSpan.FromSeconds( currentTimeValue );
             _NAudio.WhenSeekChangeTime(currentTimeValue);
-            _NAudio.Play();
             Timer.Enabled = true;
         }
 
         public void TimerTickChangeTimeBarValue(object sender, EventArgs e)
-        {
-            
-            if(_NAudio.IsStreamNull)
+		{
+			if (_NAudio.IsStreamNull)
             {
                 _NAudio.Stop();
-                _NAudio = FactoryNAudio.Create(_NAudio._fileName);
-                _NAudio.Read(null);
+                _NAudio = FactoryNAudio.Create(_NAudio.FileName);
+                _NAudio.Read();
                 _NAudio.Play();
             }
 			var currentTime = _NAudio.GetCurrentSeconds;

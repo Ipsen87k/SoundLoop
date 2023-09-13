@@ -3,6 +3,6 @@
     internal interface IPauseable
     {
         void Pause();
-        Task Resume();
+        void Resume();
     }
 }

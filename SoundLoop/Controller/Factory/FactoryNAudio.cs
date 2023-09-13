@@ -16,7 +16,7 @@ namespace SoundLoop.Controller.Factory
         {
             return fname?.GetExtensionWithoutPeriod() switch
             {
-                FormatsData.MP4 => new NAudioMedia(),
+                FormatsData.MP4 => new NAudioMedia(fname),
                 _ => new NAudioSound(fname)
             };
         }

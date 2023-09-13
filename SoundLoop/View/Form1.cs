@@ -31,7 +31,12 @@ namespace SoundLoop
 		{
 			this.timer = new();
 			this.timer.Enabled = false;
-			this.timer.Interval=30;
+			this.timer.Interval=33;
+		}
+		private void TrackBarInit()
+		{
+			volumeTrackBar.TickStyle = TickStyle.None;
+			TimeBar.TickStyle=TickStyle.None;
 		}
 	}
 	
